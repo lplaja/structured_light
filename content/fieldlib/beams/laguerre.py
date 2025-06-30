@@ -5,12 +5,13 @@ from scipy.special import genlaguerre
 from fieldlib.spatial.volume import SpatialVolume
 
 class LaguerreGaussBeam:
-    def __init__(self, amplitude, waist, wavelength, mode_indices=(0, 0), volume: SpatialVolume = None):
+    def __init__(self, amplitude, waist, wavelength, phase0=0, mode_indices=(0, 0), volume: SpatialVolume = None):
         self.amplitude = amplitude
         self.waist = waist
         self.wavelength = wavelength
         self.k = 2 * np.pi / wavelength
         self.p, self.l = mode_indices
+        self.phase0=phase0
         self.volume = volume
 
     def evaluate(self, x, y, z=0):
@@ -27,7 +28,7 @@ class LaguerreGaussBeam:
         laguerre = genlaguerre(self.p, np.abs(self.l))(rho**2)
 
         amp = (self.waist / w_z) * np.exp(-r**2 / w_z**2) * (rho**np.abs(self.l)) * laguerre
-        phase = np.exp(-1j * (self.k * r**2 / (2 * R_z) - self.l * phi + (2*self.p + np.abs(self.l) + 1) * gouy))
+        phase = np.exp(-1j * (self.k * r**2 / (2 * R_z) - self.l * phi + (2*self.p + np.abs(self.l) + 1) * gouy+self.phase0))
 
         return self.amplitude * amp * phase
 

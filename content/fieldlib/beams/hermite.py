@@ -5,11 +5,12 @@ from scipy.special import hermite
 from fieldlib.spatial.volume import SpatialVolume
 
 class HermiteGaussBeam:
-    def __init__(self, amplitude, waist, wavelength, mode_indices=(0, 0), volume: SpatialVolume = None):
+    def __init__(self, amplitude, waist, wavelength, phase0=0, mode_indices=(0, 0), volume: SpatialVolume = None):
         self.amplitude = amplitude
         self.waist = waist
         self.wavelength = wavelength
         self.k = 2 * np.pi / wavelength
+        self.phase0=phase0
         self.n, self.m = mode_indices
         self.volume = volume
 
@@ -27,7 +28,7 @@ class HermiteGaussBeam:
         y_norm = np.sqrt(2) * y / w_z
 
         envelope = np.exp(-(x**2 + y**2) / w_z**2)
-        phase = np.exp(-1j * (self.k * (x**2 + y**2) / (2 * R_z) - (self.n + self.m + 1) * gouy))
+        phase = np.exp(-1j * (self.k * (x**2 + y**2) / (2 * R_z) - (self.n + self.m + 1) * gouy+self.phase0))
 
         field = (self.waist / w_z) * Hn(x_norm) * Hm(y_norm) * envelope * phase
         return self.amplitude * field
